@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "dingtalk-stream-node",
   "version": "1.0.0",
   "description": "",
@@ -10,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/ws": "^8.5.10",
     "typescript": "^5.4.5"
   },
   "dependencies": {
