@@ -1,3 +1,6 @@
+import axios from "axios";
+import { WebSocket, type MessageEvent, type Event } from "ws";
+
 type OpenConnection = {
     endpoint: string;
     ticket: string;
@@ -58,16 +61,27 @@ export class StreamClient {
         this.subscriptions.push(disconnectSubscription);
     }
 
-    async connect() {
+    connect() {
         const url = "https://api.dingtalk.com/v1.0/gateway/connections/open";
 
         const body = {
             ...this.credentials,
             subscriptions: this.subscriptions,
         };
-        const res = await axios.post(url, body);
 
-        console.log('res ==> ', res);
+
+        axios.post(url, body)
+            .then(res => {
+                const { endpoint, ticket } = res.data;
+                const webSocket = new WebSocket(`${endpoint}?ticket=${ticket}`);
+                webSocket.onopen = (event) => {
+                    
+                };
+            }).catch(err => {
+                if (err.response) {
+
+                }
+            });
 
     }
 
