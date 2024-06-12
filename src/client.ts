@@ -1,6 +1,3 @@
-import { WebSocket } from "ws";
-import axios from "axios";
-
 type OpenConnection = {
     endpoint: string;
     ticket: string;
@@ -69,7 +66,7 @@ export class StreamClient {
             subscriptions: this.subscriptions,
         };
         const res = await axios.post(url, body);
-        
+
         console.log('res ==> ', res);
 
     }
@@ -110,5 +107,3 @@ export class StreamClient {
         return new StreamClientBuilder();
     }
 }
-
-

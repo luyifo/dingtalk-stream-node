@@ -1,3 +1,4 @@
 import { StreamClient } from "../client.js";
 
-StreamClient.builder().credentials({ clientId: "", clientSecret: "" }).connect()
+const client = StreamClient.builder().credentials({ clientId: "", clientSecret: "" }).build()
+client.connect()
