@@ -1,20 +1,10 @@
 import { WebSocket } from "ws";
-import got from "got";
+import axios from "axios";
 
-const webSocket = new WebSocket("");
-class DingTalkCredential {
-    clientId: string;
-    clientSecret: string;
-
-    constructor(clientId: string, clientSecret: string) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-    }
-}
-
-interface IEventListener {
-    onEvent(): never;
-}
+type OpenConnection = {
+    endpoint: string;
+    ticket: string;
+};
 
 type SubscriptionType = "SYSTEM" | "EVENT" | "CALLBACK";
 
@@ -25,7 +15,12 @@ type Topics = {
 };
 
 
-class Subscription {
+export interface IEventListener {
+    onEvent(): never;
+}
+
+
+export class Subscription {
     readonly type: SubscriptionType;
     readonly topic: string;
 
@@ -39,14 +34,24 @@ class Subscription {
     }
 }
 
+export class Credentials {
+    clientId: string;
+    clientSecret: string;
+
+    constructor(clientId: string, clientSecret: string) {
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+    }
+}
 
 
-class StreamClient {
-    credential: DingTalkCredential;
+export class StreamClient {
+    credentials: Credentials;
     subscriptions: Subscription[];
+    eventListener?: IEventListener;
 
-    constructor(credential: DingTalkCredential) {
-        this.credential = credential;
+    constructor(credentials: Credentials) {
+        this.credentials = credentials;
         this.subscriptions = [];
 
         const pingSubscription = Subscription.create("SYSTEM", "ping");
@@ -56,20 +61,53 @@ class StreamClient {
         this.subscriptions.push(disconnectSubscription);
     }
 
-    registerAllEvent(listener: IEventListener) {
-        const subscription = Subscription.create("EVENT", "*");
-        this.subscriptions.push(subscription);
-    }
-
     async connect() {
         const url = "https://api.dingtalk.com/v1.0/gateway/connections/open";
 
         const body = {
-            ...this.credential,
+            ...this.credentials,
             subscriptions: this.subscriptions,
         };
-        const { data } = await got.post(url, { json: body }).json();
-        console.log('data ==> ', data);
+        const res = await axios.post(url, body);
+        
+        console.log('res ==> ', res);
+
+    }
+
+    start() {
+        console.log("start");
+    }
+
+    static builder() {
+        // return new this.StreamClientBuilder();
+        class StreamClientBuilder {
+            client!: StreamClient;
+
+            constructor() { }
+
+            credentials(credentials: Credentials) {
+                if (!this.client) {
+                    this.client = new StreamClient(credentials);
+                }
+                return this;
+            }
+
+            registerAllEvent(listener: IEventListener) {
+                const subscription = Subscription.create("EVENT", "*");
+                this.client.subscriptions.push(subscription);
+                this.client.eventListener = listener;
+                return this;
+            }
+
+            build() {
+                if (!this.client) {
+                    throw new Error("Credentials must be provided first");
+                }
+                return this.client;
+            }
+        };
+
+        return new StreamClientBuilder();
     }
 }
 
