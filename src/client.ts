@@ -22,10 +22,10 @@ interface Topics {
 };
 
 export class Subscription {
-    readonly type: string;
-    readonly topic: string;
+    readonly type: keyof Topics;
+    readonly topic: Topics[keyof Topics];
 
-    private constructor(type: string, topic: string) {
+    private constructor(type: keyof Topics, topic: Topics[keyof Topics]) {
         this.type = type;
         this.topic = topic;
     }
@@ -36,26 +36,45 @@ export class Subscription {
 };
 
 
-type SubscriptionMap = {
-    messageType: keyof Topics,
-    subscriptions: Subscription[];
-};
+type SubscriptionMap = Partial<{ [Property in keyof Topics]: Subscription[] }>;
 
+interface Config {
 
+}
 
 export class StreamClient {
     credentials: Credentials;
-    // subscriptions: Subscription[];
-    subscriptionMaps: SubscriptionMap[];
+    subscriptionMap?: SubscriptionMap;
+    config?: Config;
 
-    constructor(credentials: Credentials) {
+    constructor(credentials: Credentials, config?: Config) {
         this.credentials = credentials;
-        const subscriptions = [];
+        if (config) {
+            this.config = config;
+        }
+    }
 
-        subscriptions.push(Subscription.create("SYSTEM", "ping"));
-        subscriptions.push(Subscription.create("SYSTEM", "disconnect"));
-        this.subscriptionMaps = [];
-        this.subscriptionMaps.push({ messageType: "SYSTEM", subscriptions: subscriptions });
+    private registerSystem() {
+        // const s = Subscription.create("CALLBACK", "card");
+    }
+
+    private subscribe(subscription: Subscription) {
+        
+        if (!(subscription instanceof Subscription)) {
+            const { type, topic } = subscription as Subscription;
+            throw new Error("subscription must be an instance of Subscription");
+        }
+
+        if (!this.subscriptionMap) {
+            this.subscriptionMap = {};
+        }
+
+        if (!this.subscriptionMap[subscription.type]) {
+            const subscriptions: Subscription[] = [];
+            this.subscriptionMap[subscription.type] = subscriptions;
+        }
+
+        this.subscriptionMap[subscription.type]?.push(subscription);
     }
 
     private async openConnection() {
@@ -76,6 +95,15 @@ export class StreamClient {
         }
     }
 
+
+    registerAllEvent(listener: IEventListener) {
+        const subscription = Subscription.create("EVENT", "*");
+        // this.client.subscriptions.push(subscription);
+        // this.client.eventListener = listener;
+        return this;
+    }
+
+
     async connect() {
         const { endpoint, ticket } = await this.openConnection();
         const webSocket = new WebSocket(`${endpoint}?ticket=${ticket}`);
@@ -84,37 +112,5 @@ export class StreamClient {
 
     start() {
         console.log("start");
-    }
-
-    static builder() {
-        // return new this.StreamClientBuilder();
-        class StreamClientBuilder {
-            client!: StreamClient;
-
-            constructor() { }
-
-            credentials(credentials: Credentials) {
-                if (!this.client) {
-                    this.client = new StreamClient(credentials);
-                }
-                return this;
-            }
-
-            registerAllEvent(listener: IEventListener) {
-                const subscription = Subscription.create("EVENT", "*");
-                // this.client.subscriptions.push(subscription);
-                // this.client.eventListener = listener;
-                return this;
-            }
-
-            build() {
-                if (!this.client) {
-                    throw new Error("Credentials must be provided first");
-                }
-                return this.client;
-            }
-        };
-
-        return new StreamClientBuilder();
     }
 }
