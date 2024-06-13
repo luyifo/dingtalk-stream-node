@@ -1,4 +1,7 @@
-import { StreamClient } from "../client.js";
+export const enum MessageType {
+    SYSTEM = "SYSTEM",
+    EVENT = "EVENT",
+    CALLBACK = "CALLBACK"
+}
 
-const client = StreamClient.builder().credentials({ clientId: "", clientSecret: "" }).build()
-client.connect()
+console.log(typeof MessageType.SYSTEM)

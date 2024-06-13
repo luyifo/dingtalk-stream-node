@@ -1,87 +1,84 @@
-import axios from "axios";
-import { WebSocket, type MessageEvent, type Event } from "ws";
+import axios, { AxiosError, isAxiosError } from "axios";
+import { WebSocket } from "ws";
 
-type OpenConnection = {
-    endpoint: string;
-    ticket: string;
+export interface Credentials {
+    clientId: string;
+    clientSecret: string;
+}
+
+export interface AckMessage {
+    status: "SUCCESS" | "LATER",
+    message?: string;
 };
 
-type SubscriptionType = "SYSTEM" | "EVENT" | "CALLBACK";
+export interface IEventListener {
+    receive(): AckMessage;
+}
 
-type Topics = {
+interface Topics {
     SYSTEM: "ping" | "disconnect";
     EVENT: "*";
     CALLBACK: "robot" | "card";
 };
 
-
-export interface IEventListener {
-    onEvent(): never;
-}
-
-
 export class Subscription {
-    readonly type: SubscriptionType;
+    readonly type: string;
     readonly topic: string;
 
-    private constructor(type: SubscriptionType, topic: string) {
+    private constructor(type: string, topic: string) {
         this.type = type;
         this.topic = topic;
     }
 
-    static create<T extends SubscriptionType>(type: T, topic: Topics[T]) {
+    static create<T extends keyof Topics, K extends Topics[T]>(type: T, topic: K) {
         return new Subscription(type, topic);
     }
-}
+};
 
-export class Credentials {
-    clientId: string;
-    clientSecret: string;
 
-    constructor(clientId: string, clientSecret: string) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-    }
-}
+type SubscriptionMap = {
+    messageType: keyof Topics,
+    subscriptions: Subscription[];
+};
+
 
 
 export class StreamClient {
     credentials: Credentials;
-    subscriptions: Subscription[];
-    eventListener?: IEventListener;
+    // subscriptions: Subscription[];
+    subscriptionMaps: SubscriptionMap[];
 
     constructor(credentials: Credentials) {
         this.credentials = credentials;
-        this.subscriptions = [];
+        const subscriptions = [];
 
-        const pingSubscription = Subscription.create("SYSTEM", "ping");
-        const disconnectSubscription = Subscription.create("SYSTEM", "disconnect");
-
-        this.subscriptions.push(pingSubscription);
-        this.subscriptions.push(disconnectSubscription);
+        subscriptions.push(Subscription.create("SYSTEM", "ping"));
+        subscriptions.push(Subscription.create("SYSTEM", "disconnect"));
+        this.subscriptionMaps = [];
+        this.subscriptionMaps.push({ messageType: "SYSTEM", subscriptions: subscriptions });
     }
 
-    connect() {
+    private async openConnection() {
         const url = "https://api.dingtalk.com/v1.0/gateway/connections/open";
-
         const body = {
             ...this.credentials,
-            subscriptions: this.subscriptions,
+            // subscriptions: this.subscriptions,
         };
 
+        try {
+            const res = await axios.post(url, body);
+            return res.data;
+        } catch (error) {
+            if (isAxiosError(error)) {
+                throw new Error(error.response?.data);
+            }
+            throw new Error((error as Error).message);
+        }
+    }
 
-        axios.post(url, body)
-            .then(res => {
-                const { endpoint, ticket } = res.data;
-                const webSocket = new WebSocket(`${endpoint}?ticket=${ticket}`);
-                webSocket.onopen = (event) => {
-                    
-                };
-            }).catch(err => {
-                if (err.response) {
-
-                }
-            });
+    async connect() {
+        const { endpoint, ticket } = await this.openConnection();
+        const webSocket = new WebSocket(`${endpoint}?ticket=${ticket}`);
 
     }
 
@@ -105,8 +102,8 @@ export class StreamClient {
 
             registerAllEvent(listener: IEventListener) {
                 const subscription = Subscription.create("EVENT", "*");
-                this.client.subscriptions.push(subscription);
-                this.client.eventListener = listener;
+                // this.client.subscriptions.push(subscription);
+                // this.client.eventListener = listener;
                 return this;
             }
 
