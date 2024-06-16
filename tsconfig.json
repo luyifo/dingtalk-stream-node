@@ -1,23 +1,24 @@
 {
   "compilerOptions": {
-    "strict": true, // 启用所有严格类型检查选项
-    "outDir": "./dist", // 输出目录
-    "rootDir": "./src", // 输入文件的根目录
+    "strict": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "lib": ["ES2020"],
-    "target": "ES2020", // 指定 ECMAScript 目标版本
-    "module": "commonjs", // 指定模块系统 (Node.js 常用 CommonJS)
-    "moduleResolution": "node", // 模块解析策略，适合 Node.js
-    "esModuleInterop": true, // 允许通过 import 方式导入 CommonJS 模块
-    "forceConsistentCasingInFileNames": true, // 强制在导入时严格遵守文件名大小写
-    "skipLibCheck": true, // 跳过库文件的类型检查
-    "resolveJsonModule": true, // 允许导入 JSON 文件
-    "isolatedModules": true, // 将每个文件作为单独的模块
-    "noEmit": false, // 是否在编译时不生成输出文件，通常设置为 false
-    "incremental": true, // 启用增量编译 减少每次重新编译的时间
-    "sourceMap": true, // 生成源映射文件，便于调试
-    "declaration": true, // 生成.d.ts声明文件，方便其他TypeScript项目使用
-    "declarationMap": true // 为声明文件生成源映射，便于调试
+    "target": "ES2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "incremental": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "removeComments": true
   },
-  "include": ["src/**/*"], // 包含项目中的所有源文件
-  "exclude": ["node_modules", "dist"] // 排除 node_modules 和 dist 目录
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
