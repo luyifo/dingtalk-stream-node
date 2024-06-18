@@ -10,7 +10,11 @@
   "keywords": [
     "dingtalk-steram"
   ],
-  "author": "luyifo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luyifo/dingtalk-stream-node.git"
+  },
+  "author": "luyifo@163.com",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.7.2",
