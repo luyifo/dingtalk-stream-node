@@ -1,5 +1,5 @@
 ## 说明
-本项目为个人学习使用，仅支持事件订阅动能，更多完善功能，请使用官方SDK
+本项目为个人学习使用，仅支持事件订阅功能，更多完善功能，请使用官方SDK
 
 <p align="left">
   <a target="_blank" href="https://github.com/open-dingtalk/dingtalk-stream-sdk-nodejs/actions/workflows/publish.yml">
