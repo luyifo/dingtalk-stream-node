@@ -25,12 +25,3 @@ export interface StreamMessage {
   headers: MessageHeaders | EventMessageHeader;
   data: string;
 }
-
-// export class StreamMessage {
-//   constructor(
-//     private specVersion: string,
-//     private type: MessageType,
-//     private headers: MessageHeaders | EventMessageHeader,
-//     private data: string
-//   ) {}
-// }
