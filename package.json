@@ -1,10 +1,10 @@
 {
-  "type": "module",
   "name": "dingtalk-stream-node",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "example": "ts-node src/examples/all-event.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@types/ws": "^8.5.10",
-    "tsx": "^4.15.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }
 }
