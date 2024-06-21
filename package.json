@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "dingtalk-steram"
+    "dingtalk-stream-node"
   ],
   "repository": {
     "type": "git",
