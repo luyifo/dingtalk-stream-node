@@ -1,5 +1,5 @@
 {
-  "name": "dingtalk-stream-node",
+  "name": "@luyifo/dingtalk-stream",
   "version": "1.0.2",
   "description": "",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "dingtalk-stream-node"
+    "dingtalk-stream"
   ],
   "repository": {
     "type": "git",
